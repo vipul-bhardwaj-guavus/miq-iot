@@ -1,11 +1,18 @@
 package com.guavus.vzb.streaming
 
-import org.apache.spark.sql.SparkSession
+import com.databricks.spark.avro.SchemaConverters
+import com.twitter.bijection.Injection
+import org.apache.avro.Schema
+import org.apache.avro.generic.GenericRecord
+import com.twitter.bijection.avro.GenericAvroCodecs
+import org.apache.spark.sql.{Encoders, Row, SparkSession}
 import org.apache.spark.sql.streaming.Trigger
 import org.apache.spark.sql.functions.from_unixtime
 import org.apache.log4j.Logger
-
 import com.guavus.vzb.util.Util
+import org.apache.spark.sql.types.{DataTypes, StructType}
+import org.apache.spark.sql.functions.udf
+
 import scala.io.Source
 
 object IoTStreaming {
@@ -36,22 +43,48 @@ object IoTStreaming {
 
     val source = Source.fromInputStream(Util.getInputStream(avroSchemaFile)).getLines.mkString
 
+    val parser = new Schema.Parser
+    val schema = parser.parse(source)
+    val recordInjection: Injection[GenericRecord,Array[Byte]] = GenericAvroCodecs.toBinary(schema)
+    val sqlType = SchemaConverters.toSqlType(schema).dataType.asInstanceOf[StructType]
+
     val data = spark
       .readStream
       .format("kafka")
       .options(kafkaProps)
-      .option("avroSchema",source)
       .load()
-      .select($"value")
+
+      def deserialize: (Array[Byte]) => Row = (data: Array[Byte]) => {
+        val parser = new Schema.Parser
+        val schema = parser.parse(source)
+        val recordInjection: Injection[GenericRecord,Array[Byte]] = GenericAvroCodecs.toBinary(schema)
+        val record = recordInjection.invert(data).get
+        val objectArray = new Array[Any](record.asInstanceOf[GenericRecord].getSchema.getFields.size)
+        record.getSchema.getFields.asScala.foreach(field => {
+          val fieldVal = record.get(field.pos()) match {
+            case x:org.apache.avro.util.Utf8 => x.toString
+            case y:Any => y
+          }
+          objectArray(field.pos()) = fieldVal
+        })
+        Row(objectArray:_*)
+      }
+
+    val udf_deserialize = udf(deserialize, DataTypes.createStructType(sqlType.fields))
+
+    val ds2 = data.select("value").as(Encoders.BINARY)
+        .withColumn("rows", udf_deserialize($"value"))
+        .select("rows.*")
+
     //      .select("value.*")
     //      .withColumn("year", from_unixtime($"sn_flow_end_time","yyyy"))
     //      .withColumn("month",from_unixtime($"sn_flow_end_time","MM"))
     //      .withColumn("day",from_unixtime($"sn_flow_end_time","dd"))
     //      .withColumn("hour",from_unixtime($"sn_flow_end_time","HH"))
 
-    data.printSchema()
+    ds2.printSchema()
 
-    val query = data
+    val query = ds2
       .writeStream
       .trigger(Trigger.ProcessingTime("10 seconds"))
       .outputMode("append")
