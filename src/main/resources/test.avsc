@@ -1,0 +1,7 @@
+{
+  "name": "iot",
+  "type": "record",
+  "fields": [
+    {"name": "server_ip", "type" : ["null", "string"]}
+  ]
+}

@@ -1,0 +1,122 @@
+{
+  "name": "iot",
+  "type": "record",
+  "fields": [
+    {
+      "name": "uplink_bytes",
+      "type": ["null", "long"]
+    },
+    {
+      "name": "downlink_bytes",
+      "type": ["null", "long"]
+    },
+    {
+      "name": "record_count",
+      "type": ["null", "long"]
+    },
+    {
+      "name": "source_longitude",
+      "type": ["null", "double"]
+    },
+    {
+      "name": "source_latitude",
+      "type": ["null", "double"]
+    },
+    {
+      "name": "source_region",
+      "type": ["null", "string"]
+    },
+    {
+      "name": "source_city",
+      "type": ["null", "string"]
+    },
+    {
+      "name": "source_countryCode",
+      "type": ["null", "string"]
+    },
+    {
+      "name": "destination_countryCode",
+      "type": ["null", "string"]
+    },
+    {
+      "name": "destination_city",
+      "type": ["null", "string"]
+    },
+    {
+      "name": "destination_region",
+      "type": ["null", "string"]
+    },
+    {
+      "name": "destination_latitude",
+      "type": ["null", "double"]
+    },
+    {
+      "name": "destination_longitude",
+      "type": ["null", "double"]
+    },
+    {
+      "name": "sn_flow_end_time",
+      "type": ["null", "long"]
+    },
+    {
+      "name": "sn_volume_amt_ip_bytes_uplink",
+      "type": ["null", "long"]
+    },
+    {
+      "name": "sn_volume_amt_ip_bytes_downlink",
+      "type": ["null", "long"]
+    },
+    {
+      "name": "ip_server_ip_address",
+      "type": ["null", "string"]
+    },
+    {
+      "name": "bearer_3gpp_rat_type",
+      "type": ["null", "int"]
+    },
+    {
+      "name": "bearer_3gpp_imei",
+      "type": ["null", "string"]
+    },
+    {
+      "name": "tac_id",
+      "type": ["null", "long"]
+    },
+    {
+      "name": "bearer_3gpp_imsi",
+      "type": ["null", "long"]
+    },
+    {
+      "name": "bearer_3gpp_user_location_information",
+      "type": ["null", "string"]
+    },
+    {
+      "name": "p2p_tls_sni",
+      "type": ["null", "string"]
+    },
+    {
+      "name": "AccountNumber",
+      "type": ["null", "string"]
+    },
+    {
+      "name": "Marketing_Name",
+      "type": ["null", "string"]
+    },
+    {
+      "name": "Manufacturer",
+      "type": ["null", "string"]
+    },
+    {
+      "name": "Brand_Name",
+      "type": ["null", "string"]
+    },
+    {
+      "name": "Model_Name",
+      "type": ["null", "string"]
+    },
+    {
+      "name": "Device_Type",
+      "type": ["null", "string"]
+    }
+  ]
+}
